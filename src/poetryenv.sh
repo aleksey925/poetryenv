@@ -1,5 +1,6 @@
 #!/bin/bash
-POETRYENV_PATH=~/.poetryenv
+POETRYENV_HOME_PATH=~/.poetryenv
+POETRYENV_SCRIPT_PATH="/usr/local/bin/poetryenv"
 
 POETRY_HOME=~/"Library/Application Support/pypoetry"
 POETRY_CACHE_DIR=~/"Library/Caches/pypoetry"
@@ -12,6 +13,7 @@ print_help() {
     echo "  install --python 3.11.2 --poetry 1.7.1   Install specific versions of Poetry"
     echo "  uninstall --poetry 1.7.1                 Uninstall specific versions of Poetry"
     echo "  versions                                 List all installed versions of Poetry"
+    echo "  self-install                             Install poetryenv"
     echo "  self-uninstall                           Uninstall poetryenv"
     echo "  self-purge                               Uninstall poetryenv and remove all Poetry files"
     echo
@@ -41,7 +43,7 @@ function install_poetry() {
         fi
     done
 
-    if [ -d "$POETRYENV_PATH/$poetry_ver" ]; then
+    if [ -d "$POETRYENV_HOME_PATH/$poetry_ver" ]; then
         echo "Poetry version $poetry_ver is already installed."
         exit 0
     fi
@@ -50,7 +52,7 @@ function install_poetry() {
         pyenv install "$python_ver"
     fi
 
-    poetry_path=$POETRYENV_PATH/$poetry_ver
+    poetry_path=$POETRYENV_HOME_PATH/$poetry_ver
     mkdir -p "$poetry_path"
     cd "$poetry_path" || exit 1
 
@@ -93,7 +95,7 @@ function uninstall_poetry() {
         exit 1
     fi
 
-    rm -rf "${POETRYENV_PATH:?}/$poetry_ver"
+    rm -rf "${POETRYENV_HOME_PATH:?}/$poetry_ver"
     rm -rf "${POETRY_HOME:?}/$poetry_ver"
     rm -rf "${POETRY_CACHE_DIR:?}/$poetry_ver"
 
@@ -101,16 +103,27 @@ function uninstall_poetry() {
 }
 
 function print_versions() {
-    for filename in "$POETRYENV_PATH"/*; do
+    if [[ ! -d "$POETRYENV_HOME_PATH" || -z "$(ls -A "$POETRYENV_HOME_PATH")" ]]; then
+        return
+    fi
+    for filename in "$POETRYENV_HOME_PATH"/*; do
         version=$(basename "$filename")
-        poetry_path="$POETRYENV_PATH/$version"
+        poetry_path="$POETRYENV_HOME_PATH/$version"
         echo "${version} - export PATH=\"${poetry_path//${HOME}/\$HOME}:\$PATH\""
     done
 }
 
+function self_install() {
+    script_path=$(readlink -f "$0")
+    mv "$script_path" "$POETRYENV_SCRIPT_PATH"
+    chmod +x "$POETRYENV_SCRIPT_PATH"
+    mkdir -p "$POETRYENV_HOME_PATH"
+    echo "poetryenv has been installed."
+}
+
 function self_uninstall() {
-    rm -rf "$POETRYENV_PATH"
-    rm "/usr/local/bin/poetryenv"
+    rm -rf "$POETRYENV_HOME_PATH"
+    rm $POETRYENV_SCRIPT_PATH
     echo "poetryenv has been uninstalled."
 }
 
@@ -142,6 +155,10 @@ while (( "$#" )); do
       ;;
     versions)
       COMMAND="versions"
+      shift
+      ;;
+    self-install)
+      COMMAND="self-install"
       shift
       ;;
     self-uninstall)
@@ -198,6 +215,11 @@ fi
 
 if [ "$COMMAND" = "versions" ]; then
     print_versions
+    exit 1
+fi
+
+if [ "$COMMAND" = "self-install" ]; then
+    self_install
     exit 1
 fi
 

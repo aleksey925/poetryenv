@@ -10,25 +10,7 @@ version of poetry.
 Requirements:
 
 - pyenv
-
-## Quick start
-
-You can use the following command to install this script and poetry:
-
-```bash
-curl -sSL https://raw.githubusercontent.com/aleksey925/poetryenv/master/src/poetryenv.sh -o /usr/local/bin/poetryenv && chmod +x /usr/local/bin/poetryenv && poetryenv install --python 3.11.2 --poetry 1.7.1
-```
-
-After executing this command, you need to find in output string like this:
-
-```
-Poetry version 1.7.1 has been installed.
-To begin using it, add the following line to your shell configuration file:
-export PATH="$HOME/.poetryenv/1.7.1:$PATH"
-```
-
-Copy command from output and add it to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc)
-or `.envrc` file in your project if you use `direnv`.
+- direnv (recommended)
 
 
 ## Installation
@@ -36,21 +18,32 @@ or `.envrc` file in your project if you use `direnv`.
 You can install this script using the following command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/aleksey925/poetryenv/master/src/poetryenv.sh -o /usr/local/bin/poetryenv && chmod +x /usr/local/bin/poetryenv
+curl -sSL https://raw.githubusercontent.com/aleksey925/poetryenv/master/src/poetryenv.sh -o ~/poetryenv && bash ~/poetryenv self-install
 ```
+
+Аfter successful installation you will see the following line in the console: `poetryenv has been installed.`.
 
 ## Usage
 
-This script is recommended to use with `direnv` to automatically switch between
-different versions of poetry. In this case, you need just create `.envrc` file in
-your project add there command from output of `poetryenv install` command and run
-`direnv allow`.
+This script is recommended for use with `direnv` to automatically switch between
+different versions of Poetry. In this case, you just need to create a `.envrc` file in
+your project, add the command from the output of the `install` command there, and run `direnv allow`.
 
-Example:
+For example, you can install Poetry 1.7.1 with the following command:
+`poetryenv install --python 3.11.2 --poetry 1.7.1`.
+At the end of the output, you will see a command that you need to add to the `.envrc`
+file. Here is an example of the last lines of the output:
+
+```
+Poetry version 1.7.1 has been installed.
+To begin using it, add the following line to your shell configuration file:
+export PATH="$HOME/.poetryenv/1.7.1:$PATH"
+```
+
+Here is an example of a `.envrc` file:
 
 ```bash
 export PATH="$HOME/.poetryenv/1.7.1:$PATH"
 ```
 
-Otherwise, you can modify your `PATH` environment variable in `~/.bashrc` or `~/.zshrc`
-to use one version of poetry globally.
+Alternatively, you can modify your PATH environment variable in ~/.bashrc or ~/.zshrc to use one version of Poetry globally.
