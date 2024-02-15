@@ -12,13 +12,26 @@ print_help() {
     echo
     echo "Commands:"
     echo "  install --python 3.11.2 --poetry 1.7.1   Install specific versions of Poetry"
-    echo "  uninstall --poetry 1.7.1                 Uninstall specific versions of Poetry"
-    echo "  local --poetry 1.7.1                     Set a local poetry version for a project"
+    echo "  uninstall 1.7.1                          Uninstall specific versions of Poetry"
+    echo "  local 1.7.1                              Set a local poetry version for a project"
     echo "  versions                                 List all installed versions of Poetry"
     echo "  self-install                             Install poetryenv"
     echo "  self-uninstall                           Uninstall poetryenv"
     echo "  self-purge                               Uninstall poetryenv and remove all Poetry files"
     echo
+}
+
+function get_poetry_acticate_cmd() {
+    local poetry_path="$POETRYENV_HOME_PATH_STR/$1"
+    echo "export PATH=\"${poetry_path}:\$PATH\""
+}
+
+function validate_version() {
+    local version="$1"
+    if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "Error: Version must be in the format X.Y.Z"
+        exit 1
+    fi
 }
 
 function install_poetry() {
@@ -39,10 +52,7 @@ function install_poetry() {
 
     # validate python version format
     for version in $python_ver $poetry_ver; do
-        if [[ ! $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Error: Version of python and poetry must be in the format X.Y.Z"
-            exit 1
-        fi
+        validate_version "$version"
     done
 
     if [ -d "$POETRYENV_HOME_PATH/$poetry_ver" ]; then
@@ -85,17 +95,7 @@ EOF
 function uninstall_poetry() {
     local poetry_ver="$1"
 
-    if [ -z "$poetry_ver" ]; then
-        echo "Error: You must specify poetry versions"
-        print_help
-        exit 1
-    fi
-
-    # validate poetry version format
-    if [[ ! $poetry_ver =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "Error: Version of python and poetry must be in the format X.Y.Z"
-        exit 1
-    fi
+    validate_version "$poetry_ver"
 
     rm -rf "${POETRYENV_HOME_PATH:?}/$poetry_ver"
     rm -rf "${POETRY_HOME:?}/$poetry_ver"
@@ -107,12 +107,15 @@ function uninstall_poetry() {
 function local_poetry() {
     local poetry_ver="$1"
     local envrc_file=".envrc"
-    acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
+
+    validate_version "$poetry_ver"
 
     if [[ ! -d "$POETRYENV_HOME_PATH/$poetry_ver" ]]; then
         echo "Poetry version $poetry_ver is not installed"
         exit 0
     fi
+
+    acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
 
     if [[ ! -f "$envrc_file" ]]; then
         # if .envrc file does not exist, create it
@@ -123,11 +126,6 @@ function local_poetry() {
         echo "" >> "$envrc_file"
         echo "$acticate_cmd" >> "$envrc_file"
     fi
-}
-
-function get_poetry_acticate_cmd() {
-    local poetry_path="$POETRYENV_HOME_PATH_STR/$1"
-    echo "export PATH=\"${poetry_path}:\$PATH\""
 }
 
 function print_versions() {
@@ -180,10 +178,22 @@ while (( "$#" )); do
       ;;
     uninstall)
       COMMAND="uninstall"
+      POETRY_VERSION="$2"
+      if [[ -z $POETRY_VERSION ]]; then
+          echo "Error: Poetry version not specified"
+          print_help
+          exit 1
+      fi
       shift
       ;;
     local)
       COMMAND="local"
+      POETRY_VERSION="$2"
+      if [[ -z $POETRY_VERSION ]]; then
+          echo "Error: Poetry version not specified"
+          print_help
+          exit 1
+      fi
       shift
       ;;
     versions)
@@ -208,6 +218,7 @@ while (( "$#" )); do
         shift 2
       else
         echo "Error: Value for --python is missing" >&2
+        print_help
         exit 1
       fi
       ;;
@@ -217,6 +228,7 @@ while (( "$#" )); do
         shift 2
       else
         echo "Error: Value for --poetry is missing" >&2
+        print_help
         exit 1
       fi
       ;;
