@@ -73,4 +73,6 @@ Temporary Items
 ### Project
 .python-version
 venv
+.direnv
+.envrc
 ideas.txt
