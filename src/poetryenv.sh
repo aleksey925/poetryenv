@@ -6,7 +6,6 @@ POETRYENV_SCRIPT_PATH="/usr/local/bin/poetryenv"
 POETRY_HOME=~/"Library/Application Support/pypoetry"
 POETRY_CACHE_DIR=~/"Library/Caches/pypoetry"
 
-
 print_help() {
     echo "Usage: poetryenv COMMAND"
     echo
@@ -21,7 +20,7 @@ print_help() {
     echo
 }
 
-function get_poetry_acticate_cmd() {
+function get_poetry_activate_cmd() {
     local poetry_path="$POETRYENV_HOME_PATH_STR/$1"
     echo "export PATH=\"${poetry_path}:\$PATH\""
 }
@@ -38,7 +37,7 @@ function install_poetry() {
     local python_ver="$1"
     local poetry_ver="$2"
 
-    if ! command -v pyenv &> /dev/null; then
+    if ! command -v pyenv &>/dev/null; then
         echo "pyenv is not installed. You need to install it https://github.com/pyenv/pyenv."
         exit 1
     fi
@@ -76,7 +75,7 @@ function install_poetry() {
     pip install poetry=="$poetry_ver"
     deactivate
 
-    cat << EOF > "$poetry_path/poetry"
+    cat <<EOF >"$poetry_path/poetry"
 #!/bin/bash
 export POETRY_CONFIG_DIR="$POETRY_HOME/${poetry_ver}"
 export POETRY_HOME="/$POETRY_HOME/${poetry_ver}"
@@ -89,7 +88,7 @@ EOF
     echo
     echo "Poetry version $poetry_ver has been installed"
     echo "To begin using it, add the following line to your shell configuration file:"
-    get_poetry_acticate_cmd "$poetry_ver"
+    get_poetry_activate_cmd "$poetry_ver"
 }
 
 function uninstall_poetry() {
@@ -115,27 +114,27 @@ function local_poetry() {
         exit 0
     fi
 
-    acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
+    acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
 
-    if [[ ! -f "$envrc_file" ]]; then
+    if [[ ! -f $envrc_file ]]; then
         # if .envrc file does not exist, create it
-        echo "$acticate_cmd" >> "$envrc_file"
+        echo "$acticate_cmd" >>"$envrc_file"
     elif grep -q "^export PATH=\"$POETRYENV_HOME_PATH_STR/" "$envrc_file"; then
         sed -i '' "s|^export PATH=\"$POETRYENV_HOME_PATH_STR/.*|$acticate_cmd|" "$envrc_file"
     else
-        echo "" >> "$envrc_file"
-        echo "$acticate_cmd" >> "$envrc_file"
+        echo "" >>"$envrc_file"
+        echo "$acticate_cmd" >>"$envrc_file"
     fi
 }
 
 function print_versions() {
-    if [[ ! -d "$POETRYENV_HOME_PATH" || -z "$(ls -A "$POETRYENV_HOME_PATH")" ]]; then
+    if [[ ! -d $POETRYENV_HOME_PATH || -z "$(ls -A "$POETRYENV_HOME_PATH")" ]]; then
         return
     fi
 
     for filename in "$POETRYENV_HOME_PATH"/*; do
         version=$(basename "$filename")
-        acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
+        acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
         echo "- $version - $acticate_cmd"
     done
 }
@@ -170,76 +169,76 @@ fi
 
 # extract command and command arguments
 COMMAND=""
-while (( "$#" )); do
-  case "$1" in
+while (("$#")); do
+    case "$1" in
     install)
-      COMMAND="install"
-      shift
-      ;;
+        COMMAND="install"
+        shift
+        ;;
     uninstall)
-      COMMAND="uninstall"
-      POETRY_VERSION="$2"
-      if [[ -z $POETRY_VERSION ]]; then
-          echo "Error: Poetry version not specified"
-          print_help
-          exit 1
-      fi
-      shift
-      ;;
-    local)
-      COMMAND="local"
-      POETRY_VERSION="$2"
-      if [[ -z $POETRY_VERSION ]]; then
-          echo "Error: Poetry version not specified"
-          print_help
-          exit 1
-      fi
-      shift
-      ;;
-    versions)
-      COMMAND="versions"
-      shift
-      ;;
-    self-install)
-      COMMAND="self-install"
-      shift
-      ;;
-    self-uninstall)
-      COMMAND="self-uninstall"
-      shift
-      ;;
-    self-purge)
-      COMMAND="self-purge"
-      shift
-      ;;
-    --python)
-      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
-        PYTHON_VERSION="$2"
-        shift 2
-      else
-        echo "Error: Value for --python is missing" >&2
-        print_help
-        exit 1
-      fi
-      ;;
-    --poetry)
-      if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        COMMAND="uninstall"
         POETRY_VERSION="$2"
-        shift 2
-      else
-        echo "Error: Value for --poetry is missing" >&2
-        print_help
-        exit 1
-      fi
-      ;;
+        if [[ -z $POETRY_VERSION ]]; then
+            echo "Error: Poetry version not specified"
+            print_help
+            exit 1
+        fi
+        shift
+        ;;
+    local)
+        COMMAND="local"
+        POETRY_VERSION="$2"
+        if [[ -z $POETRY_VERSION ]]; then
+            echo "Error: Poetry version not specified"
+            print_help
+            exit 1
+        fi
+        shift
+        ;;
+    versions)
+        COMMAND="versions"
+        shift
+        ;;
+    self-install)
+        COMMAND="self-install"
+        shift
+        ;;
+    self-uninstall)
+        COMMAND="self-uninstall"
+        shift
+        ;;
+    self-purge)
+        COMMAND="self-purge"
+        shift
+        ;;
+    --python)
+        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+            PYTHON_VERSION="$2"
+            shift 2
+        else
+            echo "Error: Value for --python is missing" >&2
+            print_help
+            exit 1
+        fi
+        ;;
+    --poetry)
+        if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+            POETRY_VERSION="$2"
+            shift 2
+        else
+            echo "Error: Value for --poetry is missing" >&2
+            print_help
+            exit 1
+        fi
+        ;;
     --) # end argument parsing
-      shift
-      break
-      ;;
+        shift
+        break
+        ;;
     *) # preserve positional arguments
-      break
-      ;;
-  esac
+        break
+        ;;
+    esac
 done
 
 if [ -z "$COMMAND" ]; then

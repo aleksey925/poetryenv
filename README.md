@@ -1,3 +1,5 @@
+![license](https://img.shields.io/github/license/aleksey925/poetryenv?style=for-the-badge) [![lint status](https://img.shields.io/github/actions/workflow/status/aleksey925/poetryenv/test.yml?branch=master&style=for-the-badge)](https://github.com/aleksey925/poetryenv/actions/workflows/test.yml)
+
 poetryenv
 =========
 
@@ -41,8 +43,17 @@ To apply it to the current project, use:
 poetryenv local --poetry 1.7.1
 ```
 
-Executing this command will generate a `.envrc` file in the current directory, 
+Executing this command will generate a `.envrc` file in the current directory,
 containing a command to switch to the specified version of Poetry.
 
-Alternatively, you can modify your PATH environment variable in `~/.bashrc` or 
+Alternatively, you can modify your PATH environment variable in `~/.bashrc` or
 `~/.zshrc` to use one version of Poetry globally.
+
+
+## Development
+
+### Setup environment
+
+1. Install `pyenv` and `direnv`
+2. Copy `.envrc.example` to `.envrc` and run `direnv allow`
+3. Install pre-commit `make pre-commit-install`
