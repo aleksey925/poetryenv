@@ -20,7 +20,7 @@ print_help() {
     echo
 }
 
-function get_poetry_acticate_cmd() {
+function get_poetry_activate_cmd() {
     local poetry_path="$POETRYENV_HOME_PATH_STR/$1"
     echo "export PATH=\"${poetry_path}:\$PATH\""
 }
@@ -88,7 +88,7 @@ EOF
     echo
     echo "Poetry version $poetry_ver has been installed"
     echo "To begin using it, add the following line to your shell configuration file:"
-    get_poetry_acticate_cmd "$poetry_ver"
+    get_poetry_activate_cmd "$poetry_ver"
 }
 
 function uninstall_poetry() {
@@ -114,7 +114,7 @@ function local_poetry() {
         exit 0
     fi
 
-    acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
+    acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
 
     if [[ ! -f $envrc_file ]]; then
         # if .envrc file does not exist, create it
@@ -134,7 +134,7 @@ function print_versions() {
 
     for filename in "$POETRYENV_HOME_PATH"/*; do
         version=$(basename "$filename")
-        acticate_cmd=$(get_poetry_acticate_cmd "$poetry_ver")
+        acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
         echo "- $version - $acticate_cmd"
     done
 }
