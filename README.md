@@ -12,7 +12,7 @@ version of poetry.
 Requirements:
 
 - pyenv
-- direnv (recommended)
+- direnv
 
 
 ## Installation
@@ -23,13 +23,13 @@ You can install this script using the following command:
 curl -sSL https://raw.githubusercontent.com/aleksey925/poetryenv/master/src/poetryenv.sh -o ~/poetryenv && bash ~/poetryenv self-install
 ```
 
-Аfter successful installation you will see the following line in the console: `poetryenv has been installed`.
+After successful installation you will see the following line in the console: `poetryenv has been installed`.
 
 ## Usage
 
-This script is recommended for use with `direnv` to automatically switch between
-different versions of Poetry. In this case, you just need to create a `.envrc` file in
-your project, add the command from the output of the `install` command there, and run `direnv allow`.
+This script is designed to be used in conjunction with `direnv`. It automatically
+applies commands from the `.envrc` file when you enter the folder, and automatically
+unloads these commands when you exit.
 
 For example, you can install Poetry 1.7.1 with the following command:
 
@@ -40,11 +40,10 @@ poetryenv install --python 3.11.2 --poetry 1.7.1
 To apply it to the current project, use:
 
 ```bash
-poetryenv local --poetry 1.7.1
+poetryenv local 1.7.1
 ```
 
-Executing this command will generate a `.envrc` file in the current directory,
-containing a command to switch to the specified version of Poetry.
+Executing this command will generate a `.envrc` file in the current directory.
 
 Alternatively, you can modify your PATH environment variable in `~/.bashrc` or
 `~/.zshrc` to use one version of Poetry globally.
