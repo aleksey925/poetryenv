@@ -111,19 +111,19 @@ function local_poetry() {
 
     if [[ ! -d "$POETRYENV_HOME_PATH/$poetry_ver" ]]; then
         echo "Poetry version $poetry_ver is not installed"
-        exit 0
+        exit 1
     fi
 
-    acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
+    activate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
 
     if [[ ! -f $envrc_file ]]; then
         # if .envrc file does not exist, create it
-        echo "$acticate_cmd" >>"$envrc_file"
+        echo "$activate_cmd" >>"$envrc_file"
     elif grep -q "^export PATH=\"$POETRYENV_HOME_PATH_STR/" "$envrc_file"; then
-        sed -i '' "s|^export PATH=\"$POETRYENV_HOME_PATH_STR/.*|$acticate_cmd|" "$envrc_file"
+        sed -i '' "s|^export PATH=\"$POETRYENV_HOME_PATH_STR/.*|$activate_cmd|" "$envrc_file"
     else
         echo "" >>"$envrc_file"
-        echo "$acticate_cmd" >>"$envrc_file"
+        echo "$activate_cmd" >>"$envrc_file"
     fi
 }
 
@@ -134,8 +134,8 @@ function print_versions() {
 
     for filename in "$POETRYENV_HOME_PATH"/*; do
         version=$(basename "$filename")
-        acticate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
-        echo "- $version - $acticate_cmd"
+        activate_cmd=$(get_poetry_activate_cmd "$poetry_ver")
+        echo "- $version - $activate_cmd"
     done
 }
 
@@ -249,35 +249,35 @@ fi
 
 if [ "$COMMAND" = "install" ]; then
     install_poetry "$PYTHON_VERSION" "$POETRY_VERSION"
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "uninstall" ]; then
     uninstall_poetry "$POETRY_VERSION"
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "local" ]; then
     local_poetry "$POETRY_VERSION"
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "versions" ]; then
     print_versions
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "self-install" ]; then
     self_install
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "self-uninstall" ]; then
     self_uninstall
-    exit 1
+    exit 0
 fi
 
 if [ "$COMMAND" = "self-purge" ]; then
     self_purge
-    exit 1
+    exit 0
 fi
