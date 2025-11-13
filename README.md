@@ -3,6 +3,8 @@
 poetryenv
 =========
 
+> This script is no longer maintained. Consider using [mise](https://github.com/jdx/mise) instead, which provides similar functionality.
+
 poetryenv - it is simple bash script that allow you easily install different
 versions of poetry separately and use them in project that requre different
 version of poetry.
